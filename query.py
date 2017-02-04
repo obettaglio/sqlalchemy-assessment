@@ -78,25 +78,55 @@ def get_model_info(year):
     """Takes in a year and prints out each model name, brand name, and brand
     headquarters for that year using only ONE database query."""
 
-    pass
+    model_info = db.session.query(Model.name,
+                                  Brand.name,
+                                  Brand.headquarters)\
+                           .join("brand")\
+                           .filter(Model.year == year)\
+                           .all()
+
+    for model in model_info:
+        m_name, b_name, hq = model
+        print "Model: %s | Brand: %s | Headquarters: %s" % (m_name, b_name, hq)
 
 
 def get_brands_summary():
     """Prints out each brand name and each model name with year for that brand
     using only ONE database query."""
 
-    pass
+    brand_info = db.session.query(Model.name,
+                                  Model.year,
+                                  Brand.name)\
+                           .join("brand")\
+                           .all()
+
+    used_brands = []
+    for model in brand_info:
+        model_name, model_year, brand_name = model
+        if brand_name in used_brands:
+            print "\tModel: %s | Year: %d" % (model_name, model_year)
+        else:
+            used_brands.append(brand_name)
+            print "Brand: %s" % brand_name
+            print "\tModel: %s | Year: %d" % (model_name, model_year)
 
 
 def search_brands_by_name(mystr):
     """Returns all Brand objects corresponding to brands whose names include
     the given string."""
 
-    pass
+    brands = db.session.query(Brand).filter(Brand.name.like(mystr)).all()
+    # selects brands with names that match mystr exactly...
+    # couldn't find a way to enter .like('%mystr%') without error
+
+    print brands
 
 
 def get_models_between(start_year, end_year):
     """Returns all Model objects corresponding to models made between
     start_year (inclusive) and end_year (exclusive)."""
 
-    pass
+    models = db.session.query(Model).filter((Model.year > start_year) &
+                                            (Model.year < end_year)).all()
+
+    print models
